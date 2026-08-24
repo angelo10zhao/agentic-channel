@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHOPLINE · Agentic Channel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { DEFAULT: "#3B82F6", hover: "#2563EB", soft: "#E8F1FF", ink: "#1D4ED8" },
+            ink: { DEFAULT: "#1A1A1A", muted: "#6B7280", faint: "#9CA3AF" },
+            line: "#E5E7EB",
+            canvas: "#F5F6F8",
+            surface: "#FFFFFF",
+            chrome: "#FFFFFF",
+            nav: "#111827",
+          },
+          fontFamily: {
+            sans: ['ui-sans-serif', 'system-ui', '"PingFang SC"', '"Hiragino Sans GB"', '"Microsoft YaHei"', 'sans-serif'],
+          },
+          boxShadow: {
+            card: "0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06)",
+            header: "0 1px 0 rgba(0,0,0,.06)",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html, body { height: 100%; }
+    [data-screen].hidden { display: none; }
+    .scroll-thin::-webkit-scrollbar { width: 8px; }
+    .scroll-thin::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 8px; }
+    .toggle {
+      appearance: none;
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: #D1D5DB;
+      position: relative;
+      cursor: pointer;
+      transition: background .15s ease;
+      flex-shrink: 0;
+    }
+    .toggle::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,.2);
+      transition: transform .15s ease;
+    }
+    .toggle:checked { background: #3B82F6; }
+    .toggle:checked::after { transform: translateX(18px); }
+    .toggle:disabled { cursor: not-allowed; opacity: .9; }
+    .app-ico {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .flow-step.is-active {
+      border-color: #3B82F6;
+      background: #E8F1FF;
+      box-shadow: 0 0 0 1px rgba(59,130,246,.2);
+    }
+    .flow-scroll {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 8px;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
+    .flow-scroll::-webkit-scrollbar { height: 8px; }
+    .flow-scroll::-webkit-scrollbar-thumb { background: #c4c9d2; border-radius: 8px; }
+    .flow-scroll::-webkit-scrollbar-track { background: #eef0f3; border-radius: 8px; }
+    .flow-step {
+      width: 220px;
+      min-width: 220px;
+      scroll-snap-align: start;
+    }
+    .flow-arrow-h {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      min-width: 28px;
+      color: #3B82F6;
+      flex-shrink: 0;
+    }
+    .store-hit {
+      outline: 2px solid #EF4444;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 4px rgba(239,68,68,.12);
+      position: relative;
+    }
+    .store-hit::after {
+      content: "本店商品";
+      position: absolute;
+      top: -10px;
+      right: -6px;
+      background: #EF4444;
+      color: #fff;
+      font-size: 10px;
+      line-height: 1;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      z-index: 2;
+    }
+  </style>
+<style>
+html:not(.is-unlocked) body > *:not(#demo-gate) { display: none !important; }
+    #demo-gate { position: fixed; inset: 0; z-index: 4000; display: flex; align-items: center; justify-content: center; background: #f5f6f8; }
+    html.is-unlocked #demo-gate { display: none; }
+    .demo-gate-card { width: 400px; max-width: calc(100vw - 32px); background: #fff; border: 1px solid #eaedf1; border-radius: 12px; padding: 28px 24px 24px; box-shadow: 0 8px 24px rgba(36,40,51,.08); font-family: ui-sans-serif, system-ui, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+    .demo-gate-card h1 { margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #242833; }
+    .demo-gate-card p { margin: 0 0 16px; font-size: 13px; line-height: 20px; color: #62708d; }
+    .demo-gate-card input { width: 100%; height: 36px; padding: 0 12px; border: 1px solid #d7dbe7; border-radius: 8px; font-size: 14px; color: #242833; box-sizing: border-box; }
+    .demo-gate-card input:focus { outline: none; border-color: #356dff; box-shadow: 0 0 0 2px rgba(53,109,255,.12); }
+    .demo-gate-actions { display: flex; justify-content: flex-end; margin-top: 16px; }
+    .demo-gate-error { margin: 8px 0 0; font-size: 12px; color: #d4380d; min-height: 18px; }
+    .demo-gate-actions button { height: 36px; padding: 0 16px; border: 0; border-radius: 8px; background: #356dff; color: #fff; font-size: 14px; cursor: pointer; }
+</style>
+
+  <script>
+  (function () {
+    const KEY_HASH = "5369f7a0ad77d6c2c037d556d91e730a7b6adc2ad5bc5ef96d6471cd00a606a4";
+    const STORAGE = "feedDemoAccess";
+    async function sha256(text) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+      return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+    async function matches(key) {
+      if (!key) return false;
+      return (await sha256(key.trim())) === KEY_HASH;
+    }
+    async function unlock(key) {
+      if (!(await matches(key))) return false;
+      sessionStorage.setItem(STORAGE, "1");
+      document.documentElement.classList.add("is-unlocked");
+      const url = new URL(location.href);
+      if (url.searchParams.has("key")) {
+        url.searchParams.delete("key");
+        history.replaceState({}, "", url.pathname + url.search + url.hash);
+      }
+      return true;
+    }
+    window.__feedDemoUnlock = unlock;
+    const fromUrl = new URLSearchParams(location.search).get("key");
+    if (sessionStorage.getItem(STORAGE) === "1") {
+      document.documentElement.classList.add("is-unlocked");
+    } else if (fromUrl) {
+      unlock(fromUrl);
+    }
+  })();
+  </script>
+</head>
+<body class="min-h-full bg-canvas text-ink font-sans antialiased">
+<div id="demo-gate">
+  <div class="demo-gate-card">
+    <h1>访问受限</h1>
+    <p>请输入访问密钥后查看页面。</p>
+    <input id="demo-gate-input" type="password" placeholder="访问密钥" autocomplete="current-password">
+    <div class="demo-gate-error" id="demo-gate-error"></div>
+    <div class="demo-gate-actions">
+      <button type="button" id="demo-gate-submit">进入</button>
+    </div>
+  </div>
+</div>
+  <div id="app" class="min-h-full flex flex-col">
+    <!-- Top bar -->
+    <header class="h-14 bg-chrome flex items-center gap-4 px-4 shadow-header shrink-0 z-30">
+      <button data-modal="brand-menu" class="flex items-center gap-1 font-extrabold tracking-tight text-[20px] text-ink">
+        SHOPLINE
+        <svg class="w-4 h-4 text-ink-muted" viewBox="0 0 20 20" fill="currentColor"><path d="M5.2 7.5 10 12.3l4.8-4.8 1.2 1.2L10 14.7 4 8.7z"/></svg>
+      </button>
+      <div class="flex-1 flex justify-center">
+        <label class="w-full max-w-[560px] h-9 bg-[#F3F4F6] rounded-full flex items-center gap-2 px-3 border border-transparent focus-within:border-brand focus-within:bg-white">
+          <svg class="w-4 h-4 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+          <input id="global-search" type="search" placeholder="Search" class="flex-1 bg-transparent outline-none text-sm" />
+        </label>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <button data-modal="store-menu" class="flex items-center gap-1 text-ink">
+          max006
+          <svg class="w-3.5 h-3.5 text-ink-muted" viewBox="0 0 20 20" fill="currentColor"><path d="M5.2 7.5 10 12.3l4.8-4.8 1.2 1.2L10 14.7 4 8.7z"/></svg>
+        </button>
+        <span class="px-2.5 py-0.5 rounded-full border border-brand text-brand text-xs font-medium">Premium</span>
+        <button class="p-1 text-ink-muted hover:text-ink" title="通知" onclick="toast('暂无新通知')"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"/><path d="M9 17a3 3 0 0 0 6 0"/></svg></button>
+        <button class="p-1 text-ink-muted hover:text-ink" title="设置" onclick="toast('后台设置不在本 Demo 范围内')"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H8.5A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V8.5a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+        <button class="p-1 text-ink-muted hover:text-ink" title="连接状态" onclick="toast('店铺在线')"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M5 12.5a7 7 0 0 1 14 0"/><path d="M8.5 15a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="18" r=".8" fill="currentColor"/></svg></button>
+        <button class="w-8 h-8 rounded-full bg-[#5B8DEF] text-white text-sm font-semibold" data-modal="profile-menu">G</button>
+      </div>
+    </header>
+
+    <div class="flex flex-1 min-h-0">
+      <!-- Sidebar -->
+      <aside class="w-[228px] bg-chrome border-r border-line flex flex-col shrink-0">
+        <div class="flex-1 overflow-y-auto scroll-thin px-2 py-3">
+          <div class="flex items-center justify-between px-2 pb-1">
+            <span class="text-[13px] font-semibold text-ink-muted">Apps</span>
+            <button class="w-[18px] h-[18px] rounded-full border border-ink text-ink text-sm leading-none" onclick="toast('添加应用')">+</button>
+          </div>
+          <nav class="space-y-0.5 mb-4">
+            <button class="nav-app w-full" data-app="GDPR-Privacy Banner"><span class="app-ico bg-[#22C55E]">G</span>GDPR-Privacy Banner</button>
+            <button class="nav-app w-full" data-app="TikTok Marketing"><span class="app-ico bg-black text-[9px]">♪</span>TikTok Marketing</button>
+            <button class="nav-app w-full" data-app="Flash Sales"><span class="app-ico bg-[#F97316]">⚡</span>Flash Sales</button>
+            <button class="nav-app w-full" data-app="Smart Feed">
+              <span class="flex items-center gap-2 min-w-0"><span class="app-ico bg-[#6366F1]">S</span><span class="truncate">Smart Feed</span></span>
+              <svg class="w-3.5 h-3.5 text-ink-faint shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 5h5v5"/><path d="M19 5 10 14"/><path d="M5 9v10h10"/></svg>
+            </button>
+            <button class="nav-app w-full" data-app="UGC Multi-Language"><span class="app-ico bg-[#EC4899]">U</span>UGC Multi-Language...</button>
+            <button class="nav-app w-full" data-app="Multi-platform Store">
+              <span class="flex items-center gap-2 min-w-0"><span class="app-ico bg-[#0EA5E9]">M</span><span class="truncate">Multi-platform Stor...</span></span>
+              <svg class="w-3.5 h-3.5 text-ink-faint shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 5h5v5"/><path d="M19 5 10 14"/><path d="M5 9v10h10"/></svg>
+            </button>
+            <button class="nav-app w-full" data-app="Meta (Facebook) Multi"><span class="app-ico bg-[#1877F2]">f</span>Meta (Facebook) Mult...</button>
+          </nav>
+
+          <div class="flex items-center justify-between px-2 pb-1">
+            <span class="text-[13px] font-semibold text-ink-muted">Channels</span>
+            <button class="w-[18px] h-[18px] rounded-full border border-ink text-ink text-sm leading-none" onclick="toast('添加销售渠道')">+</button>
+          </div>
+          <nav class="space-y-0.5">
+            <button class="channel-item w-full" data-channel="Online Store">
+              <span>Online Store</span>
+              <svg class="w-4 h-4 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <button id="nav-agentic" class="channel-item w-full is-active" data-channel="agentic channel">
+              <span>agentic channel</span>
+              <span data-modal="channel-more" class="px-1 text-ink-muted">···</span>
+            </button>
+            <button class="channel-item w-full" data-channel="Post Shopping">Post Shopping</button>
+            <button class="channel-item w-full" data-channel="Pinterest">Pinterest</button>
+            <button class="channel-item w-full" data-channel="Microsoft channel">Microsoft channel</button>
+            <button class="channel-item w-full" data-channel="TikTok">TikTok</button>
+            <button class="channel-item w-full" data-channel="Reddit Channel">Reddit Channel</button>
+            <button class="channel-item w-full" data-channel="Google">Google</button>
+          </nav>
+        </div>
+        <div class="p-2 border-t border-line">
+          <button class="w-full flex items-center gap-2 px-2 py-2 rounded-md text-sm hover:bg-canvas" onclick="toast('打开店铺设置')">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M4 12h2m12 0h2M12 4v2m0 12v2"/></svg>
+            Settings
+          </button>
+          <div class="mt-2 rounded-lg bg-brand-soft text-[11px] leading-snug text-[#1E40AF] px-2.5 py-2">
+            This internal store cannot be transferred to a non-SHOPLINE account.
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="flex-1 min-w-0 overflow-y-auto bg-canvas p-5">
+        <section data-screen="home">
+          <div class="grid grid-cols-[minmax(0,1.7fr)_minmax(260px,1fr)] gap-4 max-w-[1240px] items-start">
+            <!-- Enabled channels -->
+            <article class="bg-surface rounded-xl p-5 shadow-card border border-line/80">
+              <h2 class="text-[16px] font-semibold mb-5">已开启的渠道</h2>
+              <div class="flex flex-wrap gap-x-16 gap-y-6">
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input id="toggle-meta" type="checkbox" class="toggle" checked />
+                  <span class="text-sm font-medium">Meta</span>
+                </label>
+                <label class="flex items-start gap-3">
+                  <input id="toggle-google" type="checkbox" class="toggle mt-0.5" disabled />
+                  <span>
+                    <span class="block text-sm font-medium">Google</span>
+                    <span class="block text-xs text-ink-faint mt-0.5">尽请期待</span>
+                  </span>
+                </label>
+                <label class="flex items-start gap-3">
+                  <input id="toggle-gpt" type="checkbox" class="toggle mt-0.5" disabled />
+                  <span>
+                    <span class="block text-sm font-medium">ChatGPT</span>
+                    <span class="block text-xs text-ink-faint mt-0.5">尽请期待</span>
+                  </span>
+                </label>
+              </div>
+            </article>
+
+            <!-- Product summary -->
+            <article class="bg-surface rounded-xl p-5 shadow-card border border-line/80">
+              <h2 class="text-[16px] font-semibold mb-4">商品摘要</h2>
+              <button data-go="products" class="flex items-center gap-3 text-left w-full hover:opacity-90">
+                <div class="w-11 h-11 rounded-lg overflow-hidden relative shrink-0 bg-[#ddd]">
+                  <img src="assets/yoga-find-similar.jpg" alt="" class="absolute inset-0 w-full h-full object-cover" />
+                </div>
+                <span class="text-sm"><span id="product-count">3542</span> 个款式已发布</span>
+              </button>
+            </article>
+
+            <!-- Scenarios: original left column + horizontal scroll -->
+            <article id="scenario-card" class="bg-surface rounded-xl p-5 shadow-card border border-line/80 col-start-1 min-w-0">
+              <div class="flex items-baseline justify-between gap-3 mb-1">
+                <h2 class="text-[16px] font-semibold">应用场景</h2>
+                <span class="text-xs text-ink-faint">Meta · 从开启到成交 · 可左右滑动</span>
+              </div>
+              <p class="text-sm text-ink-muted mb-4">商家开启后，商品进入 Meta 发现场景；消费者可通过 Meta AI 或「找相似」找到并跳转下单。</p>
+
+              <div class="flow-scroll">
+                <!-- Step 1 -->
+                <button type="button" class="flow-step group text-left rounded-xl border border-line bg-[#FAFBFC] hover:border-brand hover:bg-brand-soft/40 p-4 transition flex flex-col" data-flow="1">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-semibold grid place-items-center shrink-0">1</span>
+                    <span class="text-[13px] font-semibold leading-snug">商家打开开关</span>
+                  </div>
+                  <div class="rounded-lg bg-white border border-line p-3 mb-3">
+                    <div class="flex items-center justify-between gap-2">
+                      <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-7 h-7 rounded-md bg-[#1877F2] text-white text-xs font-bold grid place-items-center shrink-0">f</span>
+                        <span class="text-sm font-medium">Meta</span>
+                      </div>
+                      <span class="inline-flex items-center w-10 h-5 rounded-full bg-brand relative shrink-0">
+                        <span class="absolute right-0.5 w-4 h-4 rounded-full bg-white shadow"></span>
+                      </span>
+                    </div>
+                  </div>
+                  <p class="text-[12px] text-ink-muted leading-relaxed mt-auto">在「已开启的渠道」中打开 Meta，授权商品与店铺信息同步。</p>
+                </button>
+
+                <div class="flow-arrow-h" aria-hidden="true">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </div>
+
+                <!-- Step 2 -->
+                <button type="button" class="flow-step group text-left rounded-xl border border-line bg-[#FAFBFC] hover:border-brand hover:bg-brand-soft/40 p-4 transition flex flex-col" data-flow="2">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-semibold grid place-items-center shrink-0">2</span>
+                    <span class="text-[13px] font-semibold leading-snug">同步商品至 Meta</span>
+                  </div>
+                  <div class="rounded-lg bg-white border border-line p-3 mb-3 space-y-2">
+                    <div class="flex flex-wrap items-center gap-2 text-[11px]">
+                      <span class="px-1.5 py-0.5 rounded bg-ink text-white font-semibold">SHOPLINE</span>
+                      <svg class="w-3.5 h-3.5 text-brand shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                      <span class="px-1.5 py-0.5 rounded bg-[#1877F2] text-white font-semibold">Meta</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <span class="w-6 h-6 rounded bg-gradient-to-br from-rose-200 to-amber-200 border border-line shrink-0"></span>
+                      <span class="w-6 h-6 rounded bg-gradient-to-br from-sky-200 to-indigo-300 border border-line shrink-0"></span>
+                      <span class="w-6 h-6 rounded bg-gradient-to-br from-emerald-200 to-teal-300 border border-line shrink-0"></span>
+                      <span class="text-[10px] text-ink-muted">符合条件的商品</span>
+                    </div>
+                    <p class="text-[10px] text-brand font-medium">⏱ 每日定时更新</p>
+                  </div>
+                  <p class="text-[12px] text-ink-muted leading-relaxed mt-auto">SHOPLINE 筛选符合条件的商品发送给 Meta，并按日定时增量更新。</p>
+                </button>
+
+                <div class="flow-arrow-h" aria-hidden="true">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </div>
+
+                <!-- Step 3: long-press Find Similar -->
+                <button type="button" class="flow-step group text-left rounded-xl border border-line bg-[#FAFBFC] hover:border-brand hover:bg-brand-soft/40 p-4 transition flex flex-col" data-flow="3">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-semibold grid place-items-center shrink-0">3</span>
+                    <span class="text-[13px] font-semibold leading-snug">长按「找相似」</span>
+                  </div>
+                  <div class="rounded-lg bg-white border border-line overflow-hidden mb-3 relative">
+                    <img src="assets/yoga-find-similar.jpg" alt="Instagram 上看到的瑜伽服" class="w-full h-[140px] object-cover object-top" />
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-2">
+                      <span class="inline-block text-[10px] text-white bg-black/50 rounded px-2 py-0.5">长按图片 · 找相似</span>
+                    </div>
+                  </div>
+                  <p class="text-[12px] text-ink-muted leading-relaxed mt-auto">在 Ins / Facebook 看到瑜伽服图，长按触发「找相似」视觉搜索。</p>
+                </button>
+
+                <div class="flow-arrow-h" aria-hidden="true">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </div>
+
+                <!-- Step 4: product list -->
+                <button type="button" class="flow-step group text-left rounded-xl border border-line bg-[#FAFBFC] hover:border-brand hover:bg-brand-soft/40 p-4 transition flex flex-col" data-flow="4" data-open-similar>
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-semibold grid place-items-center shrink-0">4</span>
+                    <span class="text-[13px] font-semibold leading-snug">出现商品列表</span>
+                  </div>
+                  <div class="rounded-lg bg-white border border-line p-2 mb-3 space-y-1.5">
+                    <div class="flex items-center gap-2 rounded-md border border-line p-1.5 opacity-70">
+                      <span class="w-8 h-8 rounded bg-gradient-to-br from-stone-200 to-stone-400 shrink-0"></span>
+                      <span class="text-[9px] text-ink-muted truncate">Other Brand · $79</span>
+                    </div>
+                    <div class="store-hit flex items-center gap-2 rounded-md border border-line p-1.5 bg-[#FFF8F8]">
+                      <img src="assets/yoga-find-similar.jpg" alt="本店商品" class="w-8 h-8 rounded object-cover object-top shrink-0" />
+                      <div class="min-w-0">
+                        <p class="text-[9px] font-semibold truncate">Sage Soft Yoga Set</p>
+                        <p class="text-[8px] text-ink-muted">max006 · $68</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 rounded-md border border-line p-1.5 opacity-70">
+                      <span class="w-8 h-8 rounded bg-gradient-to-br from-emerald-100 to-teal-300 shrink-0"></span>
+                      <span class="text-[9px] text-ink-muted truncate">SportLab · $72</span>
+                    </div>
+                  </div>
+                  <p class="text-[12px] text-ink-muted leading-relaxed mt-auto">搜索结果列表出现；红框标出本店已同步商品（点击放大查看）。</p>
+                </button>
+
+                <div class="flow-arrow-h" aria-hidden="true">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </div>
+
+                <!-- Step 5: product detail -->
+                <button type="button" class="flow-step group text-left rounded-xl border border-line bg-[#FAFBFC] hover:border-brand hover:bg-brand-soft/40 p-4 transition flex flex-col" data-flow="5" data-open-pdp>
+                  <div class="flex items-center gap-2 mb-3">
+                    <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-semibold grid place-items-center shrink-0">5</span>
+                    <span class="text-[13px] font-semibold leading-snug">商品详情页</span>
+                  </div>
+                  <div class="rounded-lg bg-white border border-line overflow-hidden mb-3">
+                    <img src="assets/yoga-find-similar.jpg" alt="Sage Soft Yoga Set" class="w-full h-[88px] object-cover object-top" />
+                    <div class="p-2.5">
+                      <p class="text-[11px] font-semibold truncate">Sage Soft Yoga Set</p>
+                      <p class="text-[10px] text-ink-muted mb-2">$68.00</p>
+                      <div class="grid grid-cols-2 gap-1.5">
+                        <span class="h-7 rounded-md border border-line text-[9px] font-medium grid place-items-center">加入购物车</span>
+                        <span class="h-7 rounded-md bg-brand text-white text-[9px] font-medium grid place-items-center">立即购买</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-[12px] text-ink-muted leading-relaxed mt-auto">进入店铺商品详情页，可加入购物车或立即购买（点击查看）。</p>
+                </button>
+              </div>
+
+              <div id="flow-detail" class="mt-4 rounded-xl border border-brand/30 bg-brand-soft/50 px-4 py-3 text-sm text-ink hidden">
+                <p id="flow-detail-title" class="font-semibold text-brand-ink"></p>
+                <p id="flow-detail-body" class="text-ink-muted mt-1 leading-relaxed"></p>
+              </div>
+            </article>
+
+            <!-- Update summary -->
+            <article class="bg-surface rounded-xl p-5 shadow-card border border-line/80 h-fit">
+              <h2 class="text-[16px] font-semibold mb-4">更新摘要</h2>
+              <p class="text-sm text-ink-muted">最新更新时间：<span class="text-ink">2026-08-23 23:59</span></p>
+              <p class="text-sm text-ink-muted mt-2">下次更新：<span class="text-ink">24 小时后</span></p>
+            </article>
+          </div>
+
+          <p class="text-center text-xs text-ink-muted mt-8 pb-4">
+            打开上述销售渠道，即表示您同意
+            <button data-modal="terms" class="text-brand hover:underline underline-offset-2">使用条款</button>
+          </p>
+        </section>
+
+        <section data-screen="products" class="hidden max-w-[1280px]">
+          <article class="bg-surface rounded-2xl p-6 shadow-card">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-[16px] font-semibold">已发布款式</h2>
+              <button data-go="home" class="text-sm text-brand">返回渠道首页</button>
+            </div>
+            <p class="text-sm text-ink-muted mb-4">当前已向 Meta 渠道同步 3542 个款式。以下为同步状态示意。</p>
+            <div class="divide-y border rounded-xl">
+              <div class="flex items-center justify-between px-4 py-3 text-sm"><span>在售款式</span><span>3488</span></div>
+              <div class="flex items-center justify-between px-4 py-3 text-sm"><span>缺图待补全</span><span>31</span></div>
+              <div class="flex items-center justify-between px-4 py-3 text-sm"><span>同步失败</span><span>23</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section data-screen="other-channel" class="hidden max-w-[1280px]">
+          <article class="bg-surface rounded-2xl p-10 shadow-card text-center">
+            <h2 id="other-title" class="text-lg font-semibold mb-2">渠道</h2>
+            <p class="text-sm text-ink-muted mb-6">本 Demo 聚焦 agentic channel 配置页。其他渠道仅作导航示意。</p>
+            <button data-go="home" class="h-9 px-4 rounded-lg bg-brand text-white text-sm">返回 agentic channel</button>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="terms" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-card">
+      <h3 class="font-semibold text-lg mb-3">使用条款</h3>
+      <p class="text-sm text-ink-muted leading-relaxed">开启 Meta / Google / ChatGPT 等销售渠道后，商品、库存与政策信息将按各平台要求同步。请确保商品内容、定价与隐私政策符合目标市场法规。</p>
+      <button data-close="terms" class="mt-5 h-9 px-4 rounded-lg bg-brand text-white text-sm">我知道了</button>
+    </div>
+  </div>
+
+  <div id="confirm-off" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-card">
+      <h3 class="font-semibold text-lg mb-2">关闭 Meta 渠道？</h3>
+      <p class="text-sm text-ink-muted">关闭后，帖子、搜索与对话中的商品标记将停止更新，已发布的 3542 个款式不会从 Meta 侧自动下架。</p>
+      <div class="mt-5 flex justify-end gap-2">
+        <button id="keep-on" class="h-9 px-4 rounded-lg border text-sm">保持开启</button>
+        <button id="confirm-off-btn" class="h-9 px-4 rounded-lg bg-ink text-white text-sm">确认关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="channel-more" class="hidden fixed inset-0 z-50" onclick="if(event.target===this)closeModal('channel-more')">
+    <div class="absolute left-[196px] top-[220px] bg-white rounded-lg shadow-card border border-line w-44 py-1 text-sm">
+      <button class="w-full text-left px-3 py-2 hover:bg-canvas" onclick="toast('已复制渠道链接');closeModal('channel-more')">复制链接</button>
+      <button class="w-full text-left px-3 py-2 hover:bg-canvas" onclick="toast('渠道名称暂不支持修改');closeModal('channel-more')">重命名</button>
+      <button class="w-full text-left px-3 py-2 hover:bg-canvas text-red-600" onclick="toast('内部店铺不可删除该渠道');closeModal('channel-more')">删除渠道</button>
+    </div>
+  </div>
+
+  <div id="store-menu" class="hidden fixed inset-0 z-50" onclick="if(event.target===this)closeModal('store-menu')">
+    <div class="absolute right-40 top-14 bg-white rounded-lg shadow-card border w-52 py-1 text-sm">
+      <div class="px-3 py-2 text-ink-faint text-xs">当前店铺</div>
+      <div class="px-3 py-2 font-medium">max006</div>
+      <button class="w-full text-left px-3 py-2 hover:bg-canvas" onclick="toast('切换店铺不在本 Demo 范围');closeModal('store-menu')">管理店铺</button>
+    </div>
+  </div>
+
+  <div id="brand-menu" class="hidden fixed inset-0 z-50" onclick="if(event.target===this)closeModal('brand-menu')">
+    <div class="absolute left-3 top-14 bg-white rounded-lg shadow-card border w-48 py-1 text-sm">
+      <button class="w-full text-left px-3 py-2 hover:bg-canvas" onclick="toast('返回 SHOPLINE 首页');closeModal('brand-menu')">店铺后台首页</button>
+      <button class="w-full text-left px-3 py-2 hover:bg-canvas" onclick="toast('帮助中心');closeModal('brand-menu')">帮助中心</button>
+    </div>
+  </div>
+
+  <div id="profile-menu" class="hidden fixed inset-0 z-50" onclick="if(event.target===this)closeModal('profile-menu')">
+    <div class="absolute right-4 top-14 bg-white rounded-lg shadow-card border w-48 py-1 text-sm">
+      <div class="px-3 py-2">账户 G · 管理员</div>
+      <button class="w-full text-left px-3 py-2 hover:bg-canvas" onclick="toast('已退出登录（示意）');closeModal('profile-menu')">退出</button>
+    </div>
+  </div>
+
+  <!-- Find Similar demo -->
+  <div id="find-similar" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('find-similar')">
+    <div class="bg-white rounded-2xl w-full max-w-[420px] shadow-card overflow-hidden max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-line">
+        <div>
+          <p class="text-sm font-semibold">找相似</p>
+          <p class="text-[11px] text-ink-muted">Instagram · 视觉搜索结果</p>
+        </div>
+        <button data-close="find-similar" class="w-8 h-8 rounded-full hover:bg-canvas text-ink-muted text-lg leading-none">×</button>
+      </div>
+      <div class="px-4 pt-3">
+        <div class="flex items-center gap-3 rounded-xl bg-[#F7F8FA] p-2">
+          <img src="assets/yoga-find-similar.jpg" alt="查询图片：瑜伽服" class="w-14 h-14 rounded-lg object-cover object-top" />
+          <div class="min-w-0">
+            <p class="text-xs font-medium">基于这张图片搜索相似商品</p>
+            <p class="text-[11px] text-ink-muted mt-0.5">来源：@studio.move 帖子</p>
+          </div>
+        </div>
+      </div>
+      <div class="px-4 py-3 overflow-y-auto">
+        <p class="text-[11px] text-ink-faint mb-2">相似商品 · 4 件</p>
+        <div class="space-y-2.5">
+          <div class="flex gap-3 rounded-xl border border-line p-2.5">
+            <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-stone-200 to-stone-400 shrink-0"></div>
+            <div class="min-w-0 flex-1">
+              <p class="text-[12px] font-medium truncate">Cloud Soft Yoga Set</p>
+              <p class="text-[11px] text-ink-muted">Other Brand · $79</p>
+            </div>
+          </div>
+          <div class="store-hit flex gap-3 rounded-xl border border-line p-2.5 bg-[#FFF8F8]">
+            <img src="assets/yoga-find-similar.jpg" alt="本店商品" class="w-14 h-14 rounded-lg object-cover object-top shrink-0" />
+            <div class="min-w-0 flex-1">
+              <p class="text-[12px] font-medium truncate">Sage Soft Yoga Set</p>
+              <p class="text-[11px] text-ink-muted">max006 · Online Store</p>
+              <p class="text-[12px] font-semibold text-ink mt-0.5">$68.00</p>
+            </div>
+          </div>
+          <div class="flex gap-3 rounded-xl border border-line p-2.5">
+            <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-300 shrink-0"></div>
+            <div class="min-w-0 flex-1">
+              <p class="text-[12px] font-medium truncate">Flex High-Waist Set</p>
+              <p class="text-[11px] text-ink-muted">SportLab · $72</p>
+            </div>
+          </div>
+          <div class="flex gap-3 rounded-xl border border-line p-2.5">
+            <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-rose-100 to-pink-300 shrink-0"></div>
+            <div class="min-w-0 flex-1">
+              <p class="text-[12px] font-medium truncate">Daily Flow Leggings</p>
+              <p class="text-[11px] text-ink-muted">MoveCo · $54</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="px-4 py-3 border-t border-line flex justify-end gap-2">
+        <button data-close="find-similar" class="h-9 px-4 rounded-lg border text-sm">关闭</button>
+        <button id="go-store-from-similar" class="h-9 px-4 rounded-lg bg-brand text-white text-sm">查看商品详情</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product detail page -->
+  <div id="pdp" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onclick="if(event.target===this)closeModal('pdp')">
+    <div class="bg-white rounded-2xl w-full max-w-[380px] shadow-card overflow-hidden max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-line">
+        <p class="text-sm font-semibold">商品详情</p>
+        <button data-close="pdp" class="w-8 h-8 rounded-full hover:bg-canvas text-ink-muted text-lg leading-none">×</button>
+      </div>
+      <img src="assets/yoga-find-similar.jpg" alt="Sage Soft Yoga Set" class="w-full h-[220px] object-cover object-top" />
+      <div class="px-4 py-3 overflow-y-auto">
+        <p class="text-[11px] text-ink-muted">max006 · Online Store</p>
+        <h3 class="text-base font-semibold mt-1">Sage Soft Yoga Set</h3>
+        <p class="text-lg font-semibold mt-1">$68.00</p>
+        <p class="text-[12px] text-ink-muted mt-2 leading-relaxed">柔软弹力面料，高腰阔腿设计。从「找相似」进入本店详情页，可加购或立即购买。</p>
+        <div class="mt-3 flex gap-2 text-[11px] text-ink-muted">
+          <span class="px-2 py-1 rounded bg-canvas">S</span>
+          <span class="px-2 py-1 rounded bg-ink text-white">M</span>
+          <span class="px-2 py-1 rounded bg-canvas">L</span>
+        </div>
+      </div>
+      <div class="px-4 py-3 border-t border-line grid grid-cols-2 gap-2">
+        <button id="btn-add-cart" class="h-10 rounded-lg border border-line text-sm font-medium">加入购物车</button>
+        <button id="btn-buy-now" class="h-10 rounded-lg bg-brand text-white text-sm font-medium">立即购买</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] rounded-lg bg-ink text-white text-sm px-4 py-2 shadow-card"></div>
+
+  <script>
+    function showScreen(name) {
+      document.querySelectorAll("[data-screen]").forEach((el) => {
+        el.classList.toggle("hidden", el.dataset.screen !== name);
+      });
+    }
+    function toast(message, ms = 1800) {
+      const el = document.getElementById("toast");
+      el.textContent = message;
+      el.classList.remove("hidden");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.add("hidden"), ms);
+    }
+    function openModal(id) {
+      document.getElementById(id)?.classList.remove("hidden");
+    }
+    function closeModal(id) {
+      document.getElementById(id)?.classList.add("hidden");
+    }
+
+    document.querySelectorAll(".nav-app").forEach((btn) => {
+      btn.classList.add("flex", "items-center", "gap-2", "px-2", "py-1.5", "rounded-md", "text-[13px]", "text-left", "hover:bg-canvas");
+      btn.addEventListener("click", () => toast("应用「" + btn.dataset.app + "」不在本页演示范围"));
+    });
+    document.querySelectorAll(".channel-item").forEach((btn) => {
+      btn.classList.add("flex", "items-center", "justify-between", "px-2", "py-1.5", "rounded-md", "text-[13px]", "text-left", "hover:bg-canvas");
+    });
+    document.getElementById("nav-agentic").classList.add("bg-brand-soft", "text-brand-ink", "font-medium");
+
+    document.querySelectorAll(".channel-item").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        if (e.target.closest("[data-modal]")) return;
+        const name = btn.dataset.channel;
+        if (name === "agentic channel") {
+          document.querySelectorAll(".channel-item").forEach((el) => {
+            el.classList.remove("bg-brand-soft", "text-brand-ink", "font-medium", "is-active");
+          });
+          btn.classList.add("bg-brand-soft", "text-brand-ink", "font-medium", "is-active");
+          showScreen("home");
+          return;
+        }
+        document.getElementById("other-title").textContent = name;
+        showScreen("other-channel");
+      });
+    });
+
+    const meta = document.getElementById("toggle-meta");
+    const scenario = document.getElementById("scenario-card");
+    meta.addEventListener("click", (e) => {
+      if (!meta.checked) {
+        e.preventDefault();
+        meta.checked = true;
+        openModal("confirm-off");
+      } else {
+        scenario.classList.remove("opacity-50");
+        toast("Meta 渠道已开启");
+      }
+    });
+    document.getElementById("keep-on").addEventListener("click", () => {
+      meta.checked = true;
+      closeModal("confirm-off");
+    });
+    document.getElementById("confirm-off-btn").addEventListener("click", () => {
+      meta.checked = false;
+      scenario.classList.add("opacity-50");
+      closeModal("confirm-off");
+      toast("Meta 渠道已关闭");
+    });
+    document.getElementById("toggle-google").parentElement.addEventListener("click", () => toast("Google 尽请期待"));
+    document.getElementById("toggle-gpt").parentElement.addEventListener("click", () => toast("ChatGPT 尽请期待"));
+
+    const flowCopy = {
+      1: {
+        title: "① 商家打开开关",
+        body: "在 agentic channel 中打开 Meta。开启即表示同意将符合条件的商品与必要店铺信息同步至 Meta 目录。",
+      },
+      2: {
+        title: "② SHOPLINE 同步商品",
+        body: "SHOPLINE 筛选符合条件的商品发送给 Meta；每日定时增量更新（价格、库存、上下架等），保证发现侧数据新鲜。",
+      },
+      3: {
+        title: "③ 长按「找相似」",
+        body: "消费者在 Instagram / Facebook 刷到瑜伽服图片后，长按触发「找相似」视觉搜索；也可通过 Meta AI 对话发现商品。",
+      },
+      4: {
+        title: "④ 出现商品列表",
+        body: "「找相似」返回相似商品列表。其中本店已同步到 Meta 的款式会出现在列表中，Demo 用红框标注「本店商品」。",
+      },
+      5: {
+        title: "⑤ 商品详情页",
+        body: "消费者点击本店商品进入 Online Store 商品详情页，可选择「加入购物车」或「立即购买」。订单仍落在 SHOPLINE 店铺侧。",
+      },
+    };
+    const flowDetail = document.getElementById("flow-detail");
+    const flowTitle = document.getElementById("flow-detail-title");
+    const flowBody = document.getElementById("flow-detail-body");
+    function selectFlow(step) {
+      document.querySelectorAll(".flow-step").forEach((el) => {
+        el.classList.toggle("is-active", el.dataset.flow === String(step));
+      });
+      const copy = flowCopy[step];
+      if (!copy) return;
+      flowTitle.textContent = copy.title;
+      flowBody.textContent = copy.body;
+      flowDetail.classList.remove("hidden");
+    }
+    document.querySelectorAll(".flow-step").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        selectFlow(btn.dataset.flow);
+        if (btn.hasAttribute("data-open-similar") || btn.dataset.flow === "4") {
+          openModal("find-similar");
+        }
+        if (btn.hasAttribute("data-open-pdp") || btn.dataset.flow === "5") {
+          openModal("pdp");
+        }
+      });
+    });
+    selectFlow(1);
+
+    document.getElementById("go-store-from-similar")?.addEventListener("click", () => {
+      closeModal("find-similar");
+      selectFlow(5);
+      openModal("pdp");
+    });
+    document.getElementById("btn-add-cart")?.addEventListener("click", () => {
+      toast("已加入购物车");
+    });
+    document.getElementById("btn-buy-now")?.addEventListener("click", () => {
+      toast("前往结账（示意）");
+    });
+
+    document.getElementById("global-search").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        toast(e.target.value.trim() ? "未找到「" + e.target.value.trim() + "」" : "请输入搜索词");
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      const go = e.target.closest("[data-go]");
+      if (go) {
+        e.preventDefault();
+        showScreen(go.dataset.go);
+      }
+      const modal = e.target.closest("[data-modal]");
+      if (modal) {
+        e.preventDefault();
+        e.stopPropagation();
+        openModal(modal.dataset.modal);
+      }
+      const close = e.target.closest("[data-close]");
+      if (close) {
+        e.preventDefault();
+        closeModal(close.dataset.close);
+      }
+    });
+  </script>
+<script>
+(function bindGate() {
+  const input = document.getElementById("demo-gate-input");
+  const err = document.getElementById("demo-gate-error");
+  const submit = document.getElementById("demo-gate-submit");
+  if (!input || !submit) return;
+  async function tryUnlock() {
+    err.textContent = "";
+    const ok = await window.__feedDemoUnlock(input.value);
+    if (!ok) err.textContent = "密钥不正确";
+  }
+  submit.onclick = tryUnlock;
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tryUnlock();
+  });
+})();
+</script>
+</body>
+</html>
