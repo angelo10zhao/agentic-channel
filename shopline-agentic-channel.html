@@ -123,6 +123,185 @@
       font-weight: 600;
       z-index: 2;
     }
+    .ins-phone {
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid #dbdbdb;
+      font-size: 8px;
+      color: #262626;
+      user-select: none;
+    }
+    .ins-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+      border-bottom: 1px solid #efefef;
+      background: #fff;
+    }
+    .ins-logo {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .ins-stories {
+      display: flex;
+      gap: 6px;
+      padding: 6px 8px;
+      border-bottom: 1px solid #efefef;
+      overflow: hidden;
+    }
+    .ins-story {
+      flex-shrink: 0;
+      text-align: center;
+      width: 34px;
+    }
+    .ins-story-ring {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      padding: 2px;
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    }
+    .ins-story-ring > span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      background: #ddd;
+    }
+    .ins-story p {
+      margin-top: 2px;
+      font-size: 7px;
+      color: #8e8e8e;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ins-feed-scroll {
+      max-height: 168px;
+      overflow: hidden;
+      background: #fafafa;
+      position: relative;
+    }
+    .ins-post {
+      background: #fff;
+      border-bottom: 1px solid #efefef;
+    }
+    .ins-post-head {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 7px;
+    }
+    .ins-avatar {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a78bfa, #6366f1);
+      flex-shrink: 0;
+    }
+    .ins-avatar.sage { background: linear-gradient(135deg, #86efac, #14b8a6); }
+    .ins-post-user { font-weight: 600; font-size: 8px; }
+    .ins-post-img {
+      width: 100%;
+      height: 118px;
+      object-fit: cover;
+      object-position: center 18%;
+      display: block;
+    }
+    .ins-post-img-wrap {
+      position: relative;
+      background: #eee;
+    }
+    .ins-post-img-wrap.is-pressed::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.08);
+    }
+    .ins-post-actions {
+      display: flex;
+      gap: 8px;
+      padding: 4px 7px 2px;
+      color: #262626;
+    }
+    .ins-post-caption {
+      padding: 0 7px 6px;
+      font-size: 7px;
+      line-height: 1.35;
+      color: #262626;
+    }
+    .ins-post-caption b { font-weight: 600; }
+    .ins-faded {
+      opacity: .4;
+      max-height: 28px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+    .ins-faded .ins-post-head { padding-top: 4px; padding-bottom: 2px; }
+    .ins-longpress-ring {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      width: 52px;
+      height: 52px;
+      margin: -26px 0 0 -26px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.85);
+      animation: ins-pulse 1.2s ease-out infinite;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .ins-post-img-wrap.is-pressed .ins-longpress-ring { opacity: 1; }
+    @keyframes ins-pulse {
+      0% { transform: scale(.6); opacity: .9; }
+      100% { transform: scale(1.15); opacity: 0; }
+    }
+    .ins-context-menu {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      transform: translate(-50%, -50%) scale(.92);
+      background: rgba(28,28,28,.92);
+      backdrop-filter: blur(8px);
+      border-radius: 10px;
+      padding: 4px;
+      min-width: 88px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s, transform .15s;
+      z-index: 5;
+      box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    }
+    .ins-post-img-wrap.is-pressed .ins-context-menu {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .ins-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 8px;
+      border-radius: 7px;
+      color: #fff;
+      font-size: 8px;
+      font-weight: 500;
+    }
+    .ins-menu-item.highlight {
+      background: rgba(255,255,255,.12);
+      color: #93c5fd;
+    }
+    .ins-menu-item svg { width: 10px; height: 10px; flex-shrink: 0; }
+    .ins-hint {
+      margin-top: 4px;
+      text-align: center;
+      font-size: 7px;
+      color: #8e8e8e;
+    }
   </style>
 <style>
 html:not(.is-unlocked) body > *:not(#demo-gate) { display: none !important; }
@@ -365,19 +544,64 @@ html:not(.is-unlocked) body > *:not(#demo-gate) { display: none !important; }
                   <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 </div>
 
-                <!-- Step 3: long-press Find Similar -->
-                <button type="button" class="flow-step group text-left rounded-xl border border-line bg-[#FAFBFC] hover:border-brand hover:bg-brand-soft/40 p-4 transition flex flex-col" data-flow="3">
+                <!-- Step 3: Instagram feed + long-press Find Similar -->
+                <button type="button" class="flow-step group text-left rounded-xl border border-line bg-[#FAFBFC] hover:border-brand hover:bg-brand-soft/40 p-4 transition flex flex-col" data-flow="3" id="step-ins-feed">
                   <div class="flex items-center gap-2 mb-3">
                     <span class="w-6 h-6 rounded-full bg-brand text-white text-xs font-semibold grid place-items-center shrink-0">3</span>
-                    <span class="text-[13px] font-semibold leading-snug">长按「找相似」</span>
+                    <span class="text-[13px] font-semibold leading-snug">Ins Feed · 找相似</span>
                   </div>
-                  <div class="rounded-lg bg-white border border-line overflow-hidden mb-3 relative">
-                    <img src="assets/yoga-find-similar.jpg" alt="Instagram 上看到的瑜伽服" class="w-full h-[140px] object-cover object-top" />
-                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-2">
-                      <span class="inline-block text-[10px] text-white bg-black/50 rounded px-2 py-0.5">长按图片 · 找相似</span>
+                  <div class="ins-phone mb-2" id="ins-feed-demo">
+                    <div class="ins-top">
+                      <svg class="w-3 h-3 text-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                      <span class="ins-logo">Instagram</span>
+                      <div class="flex gap-2 text-ink">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      </div>
+                    </div>
+                    <div class="ins-stories">
+                      <div class="ins-story"><div class="ins-story-ring"><span></span></div><p>your_story</p></div>
+                      <div class="ins-story"><div class="ins-story-ring"><span style="background:linear-gradient(135deg,#fda4af,#fb7185)"></span></div><p>move.lab</p></div>
+                      <div class="ins-story"><div class="ins-story-ring"><span style="background:linear-gradient(135deg,#93c5fd,#6366f1)"></span></div><p>yoga.daily</p></div>
+                      <div class="ins-story"><div class="ins-story-ring"><span style="background:linear-gradient(135deg,#fcd34d,#f97316)"></span></div><p>fit.girl</p></div>
+                    </div>
+                    <div class="ins-feed-scroll">
+                      <article class="ins-post ins-faded">
+                        <div class="ins-post-head">
+                          <span class="ins-avatar"></span>
+                          <span class="ins-post-user">move.lab</span>
+                        </div>
+                      </article>
+                      <article class="ins-post">
+                        <div class="ins-post-head">
+                          <span class="ins-avatar sage"></span>
+                          <span class="ins-post-user">studio.move</span>
+                          <span class="ml-auto text-[7px] text-ink-faint">···</span>
+                        </div>
+                        <div class="ins-post-img-wrap" id="ins-yoga-post">
+                          <img src="assets/yoga-find-similar.jpg" alt="Feed 中的瑜伽服帖子" class="ins-post-img" />
+                          <span class="ins-longpress-ring" aria-hidden="true"></span>
+                          <div class="ins-context-menu" role="menu">
+                            <div class="ins-menu-item"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>赞</div>
+                            <div class="ins-menu-item"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>评论</div>
+                            <div class="ins-menu-item highlight" id="ins-find-similar-btn" type="button">
+                              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                              找相似
+                            </div>
+                            <div class="ins-menu-item"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>分享</div>
+                          </div>
+                        </div>
+                        <div class="ins-post-actions">
+                          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>
+                        </div>
+                        <p class="ins-post-caption"><b>studio.move</b> Morning flow in sage green 🧘‍♀️</p>
+                      </article>
                     </div>
                   </div>
-                  <p class="text-[12px] text-ink-muted leading-relaxed mt-auto">在 Ins / Facebook 看到瑜伽服图，长按触发「找相似」视觉搜索。</p>
+                  <p class="ins-hint">点击卡片切换长按效果</p>
+                  <p class="text-[12px] text-ink-muted leading-relaxed mt-auto">在 Ins Feed 刷到瑜伽服帖子，长按图片弹出「找相似」。</p>
                 </button>
 
                 <div class="flow-arrow-h" aria-hidden="true">
@@ -700,8 +924,8 @@ html:not(.is-unlocked) body > *:not(#demo-gate) { display: none !important; }
         body: "SHOPLINE 筛选符合条件的商品发送给 Meta；每日定时增量更新（价格、库存、上下架等），保证发现侧数据新鲜。",
       },
       3: {
-        title: "③ 长按「找相似」",
-        body: "消费者在 Instagram / Facebook 刷到瑜伽服图片后，长按触发「找相似」视觉搜索；也可通过 Meta AI 对话发现商品。",
+        title: "③ Ins Feed · 长按「找相似」",
+        body: "消费者在 Instagram Feed 中刷到 @studio.move 的瑜伽服帖子。长按图片会弹出操作菜单，选择「找相似」进入视觉搜索。",
       },
       4: {
         title: "④ 出现商品列表",
@@ -725,9 +949,18 @@ html:not(.is-unlocked) body > *:not(#demo-gate) { display: none !important; }
       flowBody.textContent = copy.body;
       flowDetail.classList.remove("hidden");
     }
+    const insYogaPost = document.getElementById("ins-yoga-post");
+    function setInsLongPress(on) {
+      insYogaPost?.classList.toggle("is-pressed", on);
+    }
     document.querySelectorAll(".flow-step").forEach((btn) => {
       btn.addEventListener("click", () => {
         selectFlow(btn.dataset.flow);
+        if (btn.dataset.flow === "3") {
+          setInsLongPress(!insYogaPost?.classList.contains("is-pressed"));
+        } else {
+          setInsLongPress(false);
+        }
         if (btn.hasAttribute("data-open-similar") || btn.dataset.flow === "4") {
           openModal("find-similar");
         }
@@ -735,6 +968,12 @@ html:not(.is-unlocked) body > *:not(#demo-gate) { display: none !important; }
           openModal("pdp");
         }
       });
+    });
+    document.getElementById("ins-find-similar-btn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setInsLongPress(true);
+      selectFlow(4);
+      openModal("find-similar");
     });
     selectFlow(1);
 
